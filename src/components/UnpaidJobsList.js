@@ -12,11 +12,14 @@ const UnpaidJobsList = () => {
     const fetchJobs = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get(`http://localhost:3000/jobs/unpaid`, {
-          headers: {
-            profile_id: profile?.id,
-          },
-        })
+        const response = await axios.get(
+          `https://homework-deel.onrender.com/jobs/unpaid`,
+          {
+            headers: {
+              profile_id: profile?.id,
+            },
+          }
+        )
         setJobs(response.data.result)
       } catch (error) {
         setError(error)
@@ -32,11 +35,15 @@ const UnpaidJobsList = () => {
 
   const handlePayJob = async (jobId) => {
     try {
-      await axios.post(`http://localhost:3000/jobs/${jobId}/pay`, null, {
-        headers: {
-          profile_id: profile?.id,
-        },
-      })
+      await axios.post(
+        `https://homework-deel.onrender.com/jobs/${jobId}/pay`,
+        null,
+        {
+          headers: {
+            profile_id: profile?.id,
+          },
+        }
+      )
       const updatedJobs = jobs.filter((job) => job.id !== jobId)
       setJobs(updatedJobs)
     } catch (error) {

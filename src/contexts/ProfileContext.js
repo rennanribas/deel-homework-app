@@ -12,11 +12,14 @@ export const ProfileProvider = ({ children, profileId }) => {
     const fetchProfile = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get('http://localhost:3000/profile', {
-          headers: {
-            profile_id: profileId,
-          },
-        })
+        const response = await axios.get(
+          'https://homework-deel.onrender.com/profile',
+          {
+            headers: {
+              profile_id: profileId,
+            },
+          }
+        )
         setProfile(response.data.result)
       } catch (error) {
         setError(error)

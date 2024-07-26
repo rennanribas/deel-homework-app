@@ -16,7 +16,7 @@ const ContractDetails = () => {
       setIsLoading(true)
       try {
         const response = await axios.get(
-          `http://localhost:3000/contracts/${searchContractId}`,
+          `https://homework-deel.onrender.com/contracts/${searchContractId}`,
           {
             headers: {
               profile_id: profile?.id,
