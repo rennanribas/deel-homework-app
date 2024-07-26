@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import axios from 'axios'
+import ProfileContext from '../contexts/ProfileContext'
 
-const UnpaidJobsList = ({ profileId }) => {
+const UnpaidJobsList = () => {
+  const { profile } = useContext(ProfileContext)
   const [jobs, setJobs] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -12,10 +14,10 @@ const UnpaidJobsList = ({ profileId }) => {
       try {
         const response = await axios.get(`http://localhost:3000/jobs/unpaid`, {
           headers: {
-            profile_id: profileId,
+            profile_id: profile?.id,
           },
         })
-        setJobs(response.data)
+        setJobs(response.data.result)
       } catch (error) {
         setError(error)
       } finally {
@@ -23,36 +25,53 @@ const UnpaidJobsList = ({ profileId }) => {
       }
     }
 
-    if (profileId) {
+    if (profile) {
       fetchJobs()
     }
-  }, [profileId])
+  }, [profile])
+
+  const handlePayJob = async (jobId) => {
+    try {
+      await axios.post(`http://localhost:3000/jobs/${jobId}/pay`, null, {
+        headers: {
+          profile_id: profile?.id,
+        },
+      })
+      const updatedJobs = jobs.filter((job) => job.id !== jobId)
+      setJobs(updatedJobs)
+    } catch (error) {
+      console.error('Error paying job:', error)
+    }
+  }
 
   if (isLoading) {
-    return <p>Carregando lista de trabalhos não pagos...</p>
+    return <p>Loading unpaid jobs...</p>
   }
 
   if (error) {
-    return <p>Erro: {error.message}</p>
+    return <p>Error: {error.message}</p>
   }
 
-  if (!jobs.length) {
-    return <p>Não há trabalhos não pagos.</p>
+  if (!jobs.length && profile) {
+    return <p>You don't have any unpaid jobs.</p>
   }
-
-  // Exibir a lista de trabalhos não pagos (adaptar de acordo com a estrutura do seu JSON)
-  return (
-    <div>
-      <h2>Trabalhos Não Pagos</h2>
-      <ul>
-        {jobs.map((job) => (
-          <li key={job.id}>
-            {job.title} - Cliente: {job.clientName}
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
+  if (profile)
+    return (
+      <div>
+        <h2>Unpaid Jobs</h2>
+        <ul>
+          {jobs.map((job) => (
+            <li key={job.id}>
+              Description: {job.description} - Price: ${job.price} - Contract
+              ID:
+              {' ' + job.ContractId}
+              {'   '}
+              <button onClick={() => handlePayJob(job.id)}>Pay Now</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
 }
 
 export default UnpaidJobsList
